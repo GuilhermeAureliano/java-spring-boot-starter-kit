@@ -17,8 +17,8 @@
 ## Handoff
 
 Última sessão: 2026-06-28
-Feature concluída: Template Infrastructure (6 features)
-Commits: e23a0b1..b396c24
+Feature concluída: Container Optimization
+Commits: 902f96b..7d428a6
 Próxima etapa: Nenhuma — todas as tasks concluídas e validadas.
 
 ---
@@ -37,3 +37,4 @@ Nenhuma.
 - [x] Logging estruturado
 - [x] Observabilidade
 - [x] Tratamento global de erros
+- [x] Container Optimization (Dockerfile, Compose, K8s manifests, JVM tuning)
