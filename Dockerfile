@@ -18,6 +18,9 @@ COPY src/ src/
 RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew bootJar --no-daemon
 
+# Extract Spring Boot layered JAR for optimal image layers
+RUN java -Djarmode=tools -jar build/libs/*.jar extract --layers --launcher --destination extracted
+
 # ---------- Runtime stage ----------
 FROM eclipse-temurin:21-jre-jammy AS runtime
 
@@ -26,8 +29,11 @@ WORKDIR /app
 # Create non-root user
 RUN useradd --no-log-init -r -u 10001 -g root appuser
 
-# Copy the application JAR from the build stage
-COPY --from=builder /workspace/build/libs/*.jar app.jar
+# Copy extracted layers from builder (least to most mutable)
+COPY --from=builder /workspace/extracted/dependencies/ ./
+COPY --from=builder /workspace/extracted/spring-boot-loader/ ./
+COPY --from=builder /workspace/extracted/snapshot-dependencies/ ./
+COPY --from=builder /workspace/extracted/application/ ./
 
 # Run as non-root
 USER 10001
@@ -38,4 +44,4 @@ EXPOSE 8080
 ENTRYPOINT ["java", \
   "-XX:MaxRAMPercentage=65", \
   "-Xlog:gc*:stdout:time,uptime,level,tags", \
-  "-jar", "app.jar"]
+  "org.springframework.boot.loader.launch.JarLauncher"]
