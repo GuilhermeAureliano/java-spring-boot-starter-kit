@@ -1,7 +1,38 @@
+buildscript {
+    dependencies {
+        // Flyway Gradle plugin scans its own classloader for the DatabaseType SPI;
+        // put the PostgreSQL database plugin + JDBC driver on the buildscript
+        // classpath so flywayValidate/flywayMigrate find a database handler.
+        classpath("org.flywaydb:flyway-database-postgresql:10.20.1")
+        classpath("org.postgresql:postgresql:42.7.5")
+    }
+}
+
 plugins {
     java
+    checkstyle
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
+    // Pinned to mirror Spring Boot 3.4.5's managed flyway-core (10.20.1);
+    // a 12.x plugin would mix flyway-core versions and fail to load the DB plugin.
+    id("org.flywaydb.flyway") version "10.20.1"
+}
+
+checkstyle {
+    toolVersion = "10.18.1"
+    configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+}
+
+flyway {
+    url = System.getenv("FLYWAY_URL") ?: "jdbc:postgresql://localhost:5432/starterkit"
+    user = System.getenv("FLYWAY_USER") ?: "postgres"
+    password = System.getenv("FLYWAY_PASSWORD") ?: "postgres"
+    locations = arrayOf("classpath:db/migration")
+    // Only affects Gradle flywayValidate/flywayMigrate tasks (NOT the app's Spring
+    // Flyway, which uses spring.flyway.*). Lets validate pass on a fresh/ephemeral
+    // DB where all migrations are pending while still catching checksum/type drift
+    // and missing-locally among applied migrations.
+    ignoreMigrationPatterns = arrayOf("*:pending")
 }
 
 group = "com.example"
@@ -69,3 +100,38 @@ dependencyManagement {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// Separate source set for Testcontainers/integration tests so the fast unit `test`
+// task runs without Docker, while `integrationTest` exercises the DB-backed paths.
+val integrationTest by sourceSets.creating {
+    // Custom source sets do not auto-include the main compiled output (unlike `test`);
+    // add it so Spring Boot Test can locate the @SpringBootConfiguration root.
+    compileClasspath += sourceSets.main.get().compileClasspath + sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().runtimeClasspath + sourceSets.main.get().output
+}
+
+configurations[integrationTest.implementationConfigurationName]
+    .extendsFrom(configurations.testImplementation.get())
+configurations[integrationTest.runtimeOnlyConfigurationName]
+    .extendsFrom(configurations.testRuntimeOnly.get())
+
+tasks.register<Test>("integrationTest") {
+    description = "Runs integration tests backed by Testcontainers PostgreSQL."
+    group = "verification"
+    testClassesDirs = integrationTest.output.classesDirs
+    classpath = integrationTest.runtimeClasspath
+    shouldRunAfter(tasks.test)
+    maxParallelForks = 1
+}
+
+tasks.check {
+    dependsOn("integrationTest")
+}
+
+// The Flyway Gradle plugin tasks read migrations from `classpath:db/migration`,
+// which is populated only after processResources copies them into build/resources.
+// On a fresh runner (no prior build) the migration set would otherwise be empty
+// and validate/migrate would false-pass green. Wire them to `classes` so the
+// main resources are always present before Flyway runs.
+tasks.named("flywayValidate") { dependsOn("classes") }
+tasks.named("flywayMigrate") { dependsOn("classes") }

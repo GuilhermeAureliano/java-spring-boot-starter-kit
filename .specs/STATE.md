@@ -11,14 +11,19 @@
 | AD-005 | Observabilidade com Actuator + Micrometer Prometheus + Brave tracing | active | 2026-06-28 |
 | AD-006 | Tratamento global de erros com ProblemDetail (RFC 7807) | active | 2026-06-28 |
 | AD-007 | @EnableConfigurationProperties na classe principal para todos os records de config | active | 2026-06-28 |
+| AD-008 | CI/CD via GitHub Actions: trilhas separadas (CI, Flyway, dep-review, CodeQL, release). Sem deploy (sem cloud provider). | active | 2026-06-28 |
+| AD-009 | Split testes unitários x integração via source set `integrationTest` (Testcontainers separado do `test`) | active | 2026-06-28 |
+| AD-010 | Actions pinados por major version tag (não SHA); Dependabot atualiza github-actions | active | 2026-06-28 |
+| AD-011 | Plugins Gradle: Flyway (`org.flywaydb.flyway` 12.9.0) + Checkstyle habilitados em build.gradle.kts | active | 2026-06-28 |
+| AD-012 | Release: build & push de imagem OCI para ghcr.io com provenance/SBOM + attestation + Trivy scan (sem deploy) | active | 2026-06-28 |
 
 ---
 
 ## Handoff
 
 Última sessão: 2026-06-28
-Feature concluída: Container Optimization
-Commits: 902f96b..7d428a6
+Feature concluída: CI/CD Pipeline (GitHub Actions)
+Commits: a8a46ce..31ee368 (11 commits)
 Próxima etapa: Nenhuma — todas as tasks concluídas e validadas.
 
 ---
@@ -38,3 +43,4 @@ Nenhuma.
 - [x] Observabilidade
 - [x] Tratamento global de erros
 - [x] Container Optimization (Dockerfile, Compose, K8s manifests, JVM tuning)
+- [x] CI/CD Pipeline (GitHub Actions — ci, flyway-validate, dependency-review, dependabot, codeql, release-image)
