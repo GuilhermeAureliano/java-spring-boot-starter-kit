@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+
+# Gradle
+.gradle
+build
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# IDE
+.idea
+*.iml
+*.ipr
+*.iws
+.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project docs and specs (not needed in image)
+*.md
+.specs
+docs
+
+# Docker itself
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Local env files
+.env
+.env.*
+
+# SDKMAN
+.sdkmanrc
+
+# Node (if ever added)
+node_modules
