@@ -1,13 +1,38 @@
+buildscript {
+    dependencies {
+        // Flyway Gradle plugin scans its own classloader for the DatabaseType SPI;
+        // put the PostgreSQL database plugin + JDBC driver on the buildscript
+        // classpath so flywayValidate/flywayMigrate find a database handler.
+        classpath("org.flywaydb:flyway-database-postgresql:10.20.1")
+        classpath("org.postgresql:postgresql:42.7.5")
+    }
+}
+
 plugins {
     java
     checkstyle
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
+    // Pinned to mirror Spring Boot 3.4.5's managed flyway-core (10.20.1);
+    // a 12.x plugin would mix flyway-core versions and fail to load the DB plugin.
+    id("org.flywaydb.flyway") version "10.20.1"
 }
 
 checkstyle {
     toolVersion = "10.18.1"
     configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+}
+
+flyway {
+    url = System.getenv("FLYWAY_URL") ?: "jdbc:postgresql://localhost:5432/starterkit"
+    user = System.getenv("FLYWAY_USER") ?: "postgres"
+    password = System.getenv("FLYWAY_PASSWORD") ?: "postgres"
+    locations = arrayOf("classpath:db/migration")
+    // Only affects Gradle flywayValidate/flywayMigrate tasks (NOT the app's Spring
+    // Flyway, which uses spring.flyway.*). Lets validate pass on a fresh/ephemeral
+    // DB where all migrations are pending while still catching checksum/type drift
+    // and missing-locally among applied migrations.
+    ignoreMigrationPatterns = arrayOf("*:pending")
 }
 
 group = "com.example"
