@@ -22,8 +22,8 @@
 ## Handoff
 
 Última sessão: 2026-06-28
-Feature concluída: Container Optimization
-Commits: 902f96b..7d428a6
+Feature concluída: CI/CD Pipeline (GitHub Actions)
+Commits: a8a46ce..31ee368 (11 commits)
 Próxima etapa: Nenhuma — todas as tasks concluídas e validadas.
 
 ---
@@ -43,3 +43,4 @@ Nenhuma.
 - [x] Observabilidade
 - [x] Tratamento global de erros
 - [x] Container Optimization (Dockerfile, Compose, K8s manifests, JVM tuning)
+- [x] CI/CD Pipeline (GitHub Actions — ci, flyway-validate, dependency-review, dependabot, codeql, release-image)
