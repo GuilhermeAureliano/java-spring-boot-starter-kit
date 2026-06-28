@@ -127,3 +127,11 @@ tasks.register<Test>("integrationTest") {
 tasks.check {
     dependsOn("integrationTest")
 }
+
+// The Flyway Gradle plugin tasks read migrations from `classpath:db/migration`,
+// which is populated only after processResources copies them into build/resources.
+// On a fresh runner (no prior build) the migration set would otherwise be empty
+// and validate/migrate would false-pass green. Wire them to `classes` so the
+// main resources are always present before Flyway runs.
+tasks.named("flywayValidate") { dependsOn("classes") }
+tasks.named("flywayMigrate") { dependsOn("classes") }
