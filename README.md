@@ -84,8 +84,3 @@ com.example.starterkit
     ├── ItemResponse.java
     └── ItemService.java
 ```
-
-## Observações
-
-- O projeto **não utiliza Lombok**. DTOs são implementados com `record` e entidades com getters/setters explícitos.
-- A chave OpenAI no perfil `dev` é apenas um placeholder para permitir o startup. Configure `OPENAI_API_KEY` corretamente ao usar recursos de IA.
