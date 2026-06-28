@@ -18,6 +18,12 @@ spring:
 management:
   tracing:
     enabled: true
+    sampling:
+      probability: 0.1
   endpoint:
     health:
       show-details: when-authorized
+
+logging:
+  pattern:
+    correlation: "[${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
