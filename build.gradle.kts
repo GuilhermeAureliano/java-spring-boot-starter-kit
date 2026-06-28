@@ -100,3 +100,30 @@ dependencyManagement {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// Separate source set for Testcontainers/integration tests so the fast unit `test`
+// task runs without Docker, while `integrationTest` exercises the DB-backed paths.
+val integrationTest by sourceSets.creating {
+    // Custom source sets do not auto-include the main compiled output (unlike `test`);
+    // add it so Spring Boot Test can locate the @SpringBootConfiguration root.
+    compileClasspath += sourceSets.main.get().compileClasspath + sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().runtimeClasspath + sourceSets.main.get().output
+}
+
+configurations[integrationTest.implementationConfigurationName]
+    .extendsFrom(configurations.testImplementation.get())
+configurations[integrationTest.runtimeOnlyConfigurationName]
+    .extendsFrom(configurations.testRuntimeOnly.get())
+
+tasks.register<Test>("integrationTest") {
+    description = "Runs integration tests backed by Testcontainers PostgreSQL."
+    group = "verification"
+    testClassesDirs = integrationTest.output.classesDirs
+    classpath = integrationTest.runtimeClasspath
+    shouldRunAfter(tasks.test)
+    maxParallelForks = 1
+}
+
+tasks.check {
+    dependsOn("integrationTest")
+}
