@@ -153,6 +153,40 @@ export OPENAI_API_KEY=sua-chave-openai
 ./gradlew bootRun --args='--spring.profiles.active=prod'
 ```
 
+---
+
+## Build da imagem Docker
+
+O Dockerfile utiliza multi-stage build com BuildKit cache, base image Eclipse Temurin Ubuntu, usuário não-root e tuning da JVM:
+
+```bash
+docker build -t starterkit:latest .
+```
+
+A imagem roda com:
+- Heap limitado a 65% da memória do container (`-XX:MaxRAMPercentage=65`)
+- GC logging habilitado (`-Xlog:gc*`)
+- Usuário não-root (`UID 10001`)
+
+---
+
+## Kubernetes (exemplos)
+
+Manifestos de referência estão em `k8s/`:
+
+```bash
+kubectl apply --dry-run=client -f k8s/
+```
+
+O `deployment.yaml` inclui:
+- Probes: liveness, readiness e startup
+- Requests/limits de CPU e memória
+- Security context com `runAsNonRoot: true` e `runAsUser: 10001`
+
+> **Nota:** Ajuste a imagem e as secrets de banco antes de aplicar em um cluster real.
+
+---
+
 ## Dependências principais
 
 - Spring Web
