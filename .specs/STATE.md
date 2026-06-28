@@ -11,6 +11,11 @@
 | AD-005 | Observabilidade com Actuator + Micrometer Prometheus + Brave tracing | active | 2026-06-28 |
 | AD-006 | Tratamento global de erros com ProblemDetail (RFC 7807) | active | 2026-06-28 |
 | AD-007 | @EnableConfigurationProperties na classe principal para todos os records de config | active | 2026-06-28 |
+| AD-008 | CI/CD via GitHub Actions: trilhas separadas (CI, Flyway, dep-review, CodeQL, release). Sem deploy (sem cloud provider). | active | 2026-06-28 |
+| AD-009 | Split testes unitários x integração via source set `integrationTest` (Testcontainers separado do `test`) | active | 2026-06-28 |
+| AD-010 | Actions pinados por major version tag (não SHA); Dependabot atualiza github-actions | active | 2026-06-28 |
+| AD-011 | Plugins Gradle: Flyway (`org.flywaydb.flyway` 12.9.0) + Checkstyle habilitados em build.gradle.kts | active | 2026-06-28 |
+| AD-012 | Release: build & push de imagem OCI para ghcr.io com provenance/SBOM + attestation + Trivy scan (sem deploy) | active | 2026-06-28 |
 
 ---
 

@@ -1,7 +1,13 @@
 plugins {
     java
+    checkstyle
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
+}
+
+checkstyle {
+    toolVersion = "10.18.1"
+    configFile = rootProject.file("config/checkstyle/checkstyle.xml")
 }
 
 group = "com.example"
