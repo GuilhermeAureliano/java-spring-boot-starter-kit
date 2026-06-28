@@ -1,0 +1,67 @@
+name: Flyway Validate
+
+on:
+  pull_request:
+    paths:
+      - "src/main/resources/db/migration/**"
+      - "build.gradle.kts"
+      - ".github/workflows/flyway-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flyway-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "21"
+
+jobs:
+  flyway-validate:
+    name: Validate and apply migrations on ephemeral PostgreSQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: app_ci
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U app -d app_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      FLYWAY_URL: jdbc:postgresql://localhost:5432/app_ci
+      FLYWAY_USER: app
+      FLYWAY_PASSWORD: app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Validate migrations against resolved state
+        run: ./gradlew --stacktrace --no-daemon flywayValidate
+
+      - name: Apply migrations on the CI database
+        run: ./gradlew --stacktrace --no-daemon flywayMigrate
+
+      - name: Re-validate after migration (checksum/drift check)
+        run: ./gradlew --stacktrace --no-daemon flywayValidate
