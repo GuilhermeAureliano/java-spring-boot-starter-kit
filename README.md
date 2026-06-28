@@ -8,43 +8,138 @@ Template reutilizável para projetos Java + Spring Boot com Gradle.
 - **Spring Boot**: 3.4.5
 - **Gradle**: 8.13 (Kotlin DSL)
 - **Spring AI**: 1.0.0-M7
-- **Banco de dados**: H2 (dev) / PostgreSQL (prod)
+- **Banco de dados**: PostgreSQL
 - **Migrations**: Flyway
+- **Testcontainers**: PostgreSQL (testes de integração)
 
 ## Requisitos
 
 - JDK 21
+- [SDKMAN](https://sdkman.io/) (opcional, recomendado)
+- Docker & Docker Compose (opcional)
+
+## Setup com SDKMAN
+
+O projeto inclui um arquivo `.sdkmanrc` para garantir que você sempre use as versões corretas do Java e Gradle.
+
+```bash
+# Dentro da pasta do projeto
+sdk env
+```
+
+> **Dica:** Para ativar automaticamente sempre que entrar na pasta:
+> ```bash
+> sdk config
+> # Altere sdkman_auto_env para true
+> ```
 
 ## Como usar
 
-### Executar localmente (perfil dev)
+Escolha uma das três opções abaixo de acordo com a sua preferência:
+
+---
+
+### Opção 1: Projeto local + PostgreSQL local
+
+1. Certifique-se de que o PostgreSQL está instalado e rodando localmente.
+2. Crie o banco `starterkit`.
+3. Execute a aplicação:
 
 ```bash
 ./gradlew bootRun
 ```
 
-A aplicação sobe em `http://localhost:8080` com banco H2 em memória.
+A aplicação sobe em `http://localhost:8080` e se conecta ao PostgreSQL local.
+
+**Variáveis de ambiente (padrões do `application-dev.yml`):**
+
+| Variável       | Valor padrão  |
+|----------------|---------------|
+| `DATABASE_URL` | `jdbc:postgresql://localhost:5432/starterkit` |
+| `DATABASE_USER`| `postgres`    |
+| `DATABASE_PASSWORD`| `postgres` |
+| `OPENAI_API_KEY`| `dummy-dev-key` |
+
+---
+
+### Opção 2: Projeto via Docker + PostgreSQL via Docker
+
+Levanta toda a stack (aplicação + banco) com Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+- Aplicação: `http://localhost:8080`
+- PostgreSQL: porta `5432`
+
+Para parar:
+
+```bash
+docker compose down
+```
+
+---
+
+### Opção 3: Banco via Docker + Projeto localmente
+
+Ideal para desenvolvimento local sem instalar o PostgreSQL na máquina:
+
+1. Inicie apenas o banco:
+
+```bash
+docker compose up postgres -d
+```
+
+2. Execute a aplicação normalmente:
+
+```bash
+./gradlew bootRun
+```
+
+A aplicação se conectará ao PostgreSQL rodando no container.
+
+Para parar o banco:
+
+```bash
+docker compose down
+```
+
+---
+
+## Endpoints
 
 ### Health check
 
 ```bash
-curl http://localhost:8080/actuator/health
+curl http://localhost:8080/api/health
 ```
 
-### Build e testes
+Resposta:
+
+```json
+{
+  "status": "UP",
+  "timestamp": "2025-01-01T12:00:00Z"
+}
+```
+
+### Actuator
 
 ```bash
-./gradlew build
-./gradlew test
+curl http://localhost:8080/actuator/health
+curl http://localhost:8080/actuator/info
 ```
 
-### Console H2 (dev)
+## Build e testes
 
-Acesse `http://localhost:8080/h2-console`.
+```bash
+# Compilar e rodar testes
+./gradlew build
 
-- JDBC URL: `jdbc:h2:mem:starterkit`
-- User: `sa`
-- Password: (deixe em branco)
+# Apenas testes
+./gradlew test
+```
 
 ## Perfil de produção
 
@@ -67,7 +162,6 @@ export OPENAI_API_KEY=sua-chave-openai
 - Spring Boot DevTools
 - Flyway
 - PostgreSQL Driver
-- H2 (runtime dev)
 - Spring AI OpenAI Starter
 - Testcontainers (testes)
 
@@ -76,11 +170,6 @@ export OPENAI_API_KEY=sua-chave-openai
 ```
 com.example.starterkit
 ├── SpringBootStarterKitApplication.java
-└── item
-    ├── Item.java
-    ├── ItemController.java
-    ├── ItemRepository.java
-    ├── ItemRequest.java
-    ├── ItemResponse.java
-    └── ItemService.java
+└── health
+    └── HealthCheckController.java
 ```
