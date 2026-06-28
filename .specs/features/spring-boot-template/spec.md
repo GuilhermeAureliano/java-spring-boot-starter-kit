@@ -103,24 +103,24 @@ Starting a new Java + Spring Boot project requires repeating the same initial se
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| SBK-01 | P1: Reusable Project Skeleton | Build | Pending |
-| SBK-02 | P1: Reusable Project Skeleton | Runtime | Pending |
-| SBK-03 | P1: Reusable Project Skeleton | Build | Pending |
-| SBK-04 | P2: Common Dependencies Pre-Configured | Build | Pending |
-| SBK-05 | P2: Common Dependencies Pre-Configured | Runtime | Pending |
-| SBK-06 | P2: Common Dependencies Pre-Configured | Runtime | Pending |
-| SBK-07 | P3: Minimal Example Domain and Tests | Runtime | Pending |
-| SBK-08 | P3: Minimal Example Domain and Tests | Runtime | Pending |
-| SBK-09 | P3: Minimal Example Domain and Tests | Test | Pending |
+| SBK-01 | P1: Reusable Project Skeleton | Build | Verified |
+| SBK-02 | P1: Reusable Project Skeleton | Runtime | Verified |
+| SBK-03 | P1: Reusable Project Skeleton | Build | Verified |
+| SBK-04 | P2: Common Dependencies Pre-Configured | Build | Verified |
+| SBK-05 | P2: Common Dependencies Pre-Configured | Runtime | Verified |
+| SBK-06 | P2: Common Dependencies Pre-Configured | Runtime | Verified |
+| SBK-07 | P3: Minimal Example Domain and Tests | Runtime | Verified |
+| SBK-08 | P3: Minimal Example Domain and Tests | Runtime | Verified |
+| SBK-09 | P3: Minimal Example Domain and Tests | Test | Verified |
 
-**Coverage:** 9 total, 0 mapped to tasks, 9 unmapped ⚠️
+**Coverage:** 9 total, 9 verified, 0 unmapped
 
 ---
 
 ## Success Criteria
 
-- [ ] `./gradlew build` completes successfully on a clean clone.
-- [ ] `./gradlew test` runs without failures.
-- [ ] Application starts in `dev` profile without external dependencies.
-- [ ] `/actuator/health` returns HTTP 200 when the application is running.
-- [ ] No Lombok dependency or plugin is present in the build.
+- [x] `./gradlew build` completes successfully on a clean clone.
+- [x] `./gradlew test` runs without failures.
+- [x] Application starts in `dev` profile without external dependencies.
+- [x] `/actuator/health` returns HTTP 200 when the application is running.
+- [x] No Lombok dependency or plugin is present in the build.

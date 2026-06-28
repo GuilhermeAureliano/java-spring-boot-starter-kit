@@ -41,6 +41,7 @@
 
 **Tests**: none (config-only task)
 **Gate**: Build
+**Status**: ✅ Done
 
 ---
 
@@ -57,6 +58,7 @@
 
 **Tests**: none (config-only task)
 **Gate**: Build
+**Status**: ✅ Done
 
 ---
 
@@ -77,6 +79,7 @@
 - `ItemServiceTest`: `listAll` and `create` behavior with mocked repository.
 
 **Gate**: Quick
+**Status**: ✅ Done
 
 ---
 
@@ -93,6 +96,7 @@
 
 **Tests**: integration tests above
 **Gate**: Quick
+**Status**: ✅ Done
 
 ---
 
@@ -109,6 +113,7 @@
 
 **Tests**: none (verification + docs task)
 **Gate**: Build
+**Status**: ✅ Done
 
 ---
 
@@ -116,12 +121,12 @@
 
 | Requirement ID | Task | Status |
 | -------------- | ---- | ------ |
-| SBK-01 | T1 | Pending |
-| SBK-02 | T5 | Pending |
-| SBK-03 | T1 | Pending |
-| SBK-04 | T1 | Pending |
-| SBK-05 | T2 | Pending |
-| SBK-06 | T2 | Pending |
-| SBK-07 | T3, T4 | Pending |
-| SBK-08 | T3, T4 | Pending |
-| SBK-09 | T3, T4 | Pending |
+| SBK-01 | T1 | ✅ Verified |
+| SBK-02 | T5 | ✅ Verified |
+| SBK-03 | T1 | ✅ Verified |
+| SBK-04 | T1 | ✅ Verified |
+| SBK-05 | T2 | ✅ Verified |
+| SBK-06 | T2 | ✅ Verified |
+| SBK-07 | T3, T4 | ✅ Verified |
+| SBK-08 | T3, T4 | ✅ Verified |
+| SBK-09 | T3, T4 | ✅ Verified |
