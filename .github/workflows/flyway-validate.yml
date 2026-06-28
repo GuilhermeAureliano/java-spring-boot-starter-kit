@@ -63,5 +63,13 @@ jobs:
       - name: Apply migrations on the CI database
         run: ./gradlew --stacktrace --no-daemon flywayMigrate
 
+      - name: Assert migrations were actually applied (app_meta exists)
+        run: |
+          result=$(docker run --rm --network host postgres:16 \
+            psql "postgresql://app:app@localhost:5432/app_ci" -tAc \
+            "SELECT to_regclass('public.app_meta') IS NOT NULL")
+          echo "app_meta present: ${result}"
+          [ "${result}" = "t" ] || { echo "::error::flywayMigrate reported success but app_meta table is missing"; exit 1; }
+
       - name: Re-validate after migration (checksum/drift check)
         run: ./gradlew --stacktrace --no-daemon flywayValidate
