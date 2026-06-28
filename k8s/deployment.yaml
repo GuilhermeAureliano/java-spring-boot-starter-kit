@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-starter-kit
+  labels:
+    app: spring-boot-starter-kit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-boot-starter-kit
+  template:
+    metadata:
+      labels:
+        app: spring-boot-starter-kit
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: app
+          image: starterkit:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: DATABASE_URL
+              value: "jdbc:postgresql://postgres:5432/starterkit"
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: starterkit-secrets
+                  key: database-user
+                  optional: true
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: starterkit-secrets
+                  key: database-password
+                  optional: true
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 30
