@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "21"
+  GRADLE_OPTS: >-
+    -Dorg.gradle.daemon=false
+    -Dorg.gradle.caching=true
+    -Dorg.gradle.configuration-cache=true
+
+jobs:
+  build-unit:
+    name: Build + unit tests + checkstyle
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          dependency-graph: generate-and-submit
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Compile, unit tests and checkstyle
+        run: ./gradlew --stacktrace --no-daemon clean test checkstyleMain checkstyleTest bootJar
+
+      - name: Upload build artifacts and reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-unit-reports
+          path: |
+            build/libs/*.jar
+            build/reports/**
+            build/test-results/**
+          retention-days: 14
+          if-no-files-found: warn
+
+  integration:
+    name: Integration tests (Testcontainers)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    needs: build-unit
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run integration tests
+        run: ./gradlew --stacktrace --no-daemon integrationTest
+
+      - name: Upload integration reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: integration-reports
+          path: |
+            build/reports/**
+            build/test-results/**
+          retention-days: 14
+          if-no-files-found: warn
